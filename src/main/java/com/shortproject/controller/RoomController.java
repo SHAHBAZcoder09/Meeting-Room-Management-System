@@ -1,0 +1,44 @@
+package com.shortproject.controller;
+
+import com.shortproject.model.MeetingRoom;
+import com.shortproject.service.RoomService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/rooms")
+@RequiredArgsConstructor
+public class RoomController {
+
+    private final RoomService roomService;
+
+    @GetMapping
+    public ResponseEntity<List<MeetingRoom>> getAllRooms() {
+        return ResponseEntity.ok(roomService.getAllRooms());
+    }
+
+    @PostMapping
+    public ResponseEntity<MeetingRoom> createRoom(@RequestBody MeetingRoom room) {
+        return ResponseEntity.ok(roomService.createRoom(room));
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<MeetingRoom> getRoomById(@PathVariable Long id) {
+        return ResponseEntity.ok(roomService.getRoomById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MeetingRoom> updateRoom(@PathVariable Long id, @RequestBody MeetingRoom roomDetails) {
+        return ResponseEntity.ok(roomService.updateRoom(id, roomDetails));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteRoom(@PathVariable Long id) {
+        roomService.deleteRoom(id);
+        return ResponseEntity.ok().build();
+    }
+    
+    // Additional admin endpoints can be added here
+}

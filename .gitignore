@@ -1,0 +1,67 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+.m2/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+log4j.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (if using npm for frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Documentation (unnecessary markdown files)
+API_DOCUMENTATION.md
+COMPLETION_SUMMARY.md
+DEPLOYMENT_CHECKLIST.md
+FINAL_REPORT.md
+FRONTEND_DOCUMENTATION.md
+INDEX.md
+PROJECT_SUMMARY.md
+README_FIRST.md
+SETUP_GUIDE.md
+
+# Build outputs and Eclipse/IntelliJ
+bin/
+.classpath
+.project
+.settings/
+*.class
+
+# System and backup files
+*.bak
