@@ -1,0 +1,6 @@
+@import './base.css';
+
+/* 
+  Reset default create-vue layout styles that interfere with full-screen apps.
+  All layout should be handled by components (App.vue, Views).
+*/
