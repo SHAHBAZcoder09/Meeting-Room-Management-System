@@ -35,7 +35,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
         String token = jwtTokenProvider.generateToken(savedUser.getEmail());
 
-        return new AuthResponseDTO(token, savedUser.getId(), savedUser.getEmail(), savedUser.getFirstName(), savedUser.getRole());
+        return new AuthResponseDTO(token, savedUser.getId(), savedUser.getEmail(), savedUser.getFirstName(), savedUser.getLastName(), savedUser.getRole());
     }
 
     public AuthResponseDTO login(LoginDTO dto) {
@@ -51,7 +51,7 @@ public class UserService {
         }
 
         String token = jwtTokenProvider.generateToken(user.getEmail());
-        return new AuthResponseDTO(token, user.getId(), user.getEmail(), user.getFirstName(), user.getRole());
+        return new AuthResponseDTO(token, user.getId(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getRole());
     }
     
     // ... CRUD methods ...
@@ -70,6 +70,17 @@ public class UserService {
         user.setEmail(userDetails.getEmail());
         // Simple update logic
         return userRepository.save(user);
+    }
+
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = getUserById(userId);
+        
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+        
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     public void deleteUser(Long id) {
