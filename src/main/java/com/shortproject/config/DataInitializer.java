@@ -9,29 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DataInitializer {
     
-    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
-
-    public DataInitializer(org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Bean
-    CommandLineRunner initDatabase(com.shortproject.repository.MeetingRoomRepository roomRepository, com.shortproject.repository.UserRepository userRepository) {
+    CommandLineRunner initDatabase(MeetingRoomRepository roomRepository) {
         return args -> {
-            // Seed Admin User
-            if (!userRepository.existsByEmail("admin@n4.com")) {
-                com.shortproject.model.User admin = new com.shortproject.model.User();
-                admin.setFirstName("Super");
-                admin.setLastName("Admin");
-                admin.setEmail("admin@n4.com");
-                admin.setPassword(passwordEncoder.encode("admin123"));
-                admin.setRole("ADMIN");
-                admin.setActive(true);
-                userRepository.save(admin);
-                System.out.println("Created default admin: admin@n4.com / admin123");
-            }
-
-            // Seed Rooms
             if(roomRepository.count() == 0) {
                 MeetingRoom room1 = new MeetingRoom();
                 room1.setName("Conference Room A");

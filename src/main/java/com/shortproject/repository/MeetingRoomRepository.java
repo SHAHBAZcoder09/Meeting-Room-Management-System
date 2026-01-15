@@ -8,5 +8,4 @@ import java.util.List;
 @Repository
 public interface MeetingRoomRepository extends JpaRepository<MeetingRoom, Long> {
     List<MeetingRoom> findByStatus(String status);
-    List<MeetingRoom> findByCapacityGreaterThanEqual(int capacity);
 }

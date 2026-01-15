@@ -2,7 +2,6 @@ package com.shortproject.controller;
 
 import com.shortproject.dto.AuthResponseDTO;
 import com.shortproject.dto.LoginDTO;
-import com.shortproject.dto.PasswordChangeDTO;
 import com.shortproject.dto.UserRegistrationDTO;
 import com.shortproject.model.User;
 import com.shortproject.service.UserService;
@@ -73,19 +72,6 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    /**
-     * Change password
-     */
-    @PostMapping("/{id}/change-password")
-    public ResponseEntity<?> changePassword(@PathVariable Long id, @Valid @RequestBody PasswordChangeDTO dto) {
-        try {
-            userService.changePassword(id, dto.getCurrentPassword(), dto.getNewPassword());
-            return ResponseEntity.ok().body("{\"message\": \"Password changed successfully\"}");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("{\"error\": \"" + e.getMessage() + "\"}");
-        }
     }
 
     /**

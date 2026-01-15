@@ -38,7 +38,7 @@ public class BookingService {
         booking.setStartTime(start);
         booking.setEndTime(end);
         booking.setPurpose(purpose);
-        booking.setStatus("PENDING");
+        booking.setStatus("CONFIRMED");
 
         return bookingRepository.save(booking);
     }
@@ -46,52 +46,11 @@ public class BookingService {
     public List<Booking> getUserBookings(Long userId) {
         return bookingRepository.findByUserId(userId);
     }
-    
-    public List<Booking> findAllBookings() {
-        return bookingRepository.findAll();
-    }
-    
-    public List<Booking> findPendingBookings() {
-        return bookingRepository.findByStatus("PENDING");
-    }
-
-    public Booking approveBooking(Long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
-        
-        // Double check availability before confirming
-        List<Booking> conflicts = bookingRepository.findConflictingBookings(
-            booking.getRoom().getId(), booking.getStartTime(), booking.getEndTime()
-        );
-        
-        // Filter out self
-        boolean conflictExists = conflicts.stream().anyMatch(b -> !b.getId().equals(bookingId));
-        
-        if (conflictExists) {
-            booking.setStatus("REJECTED");
-            bookingRepository.save(booking);
-            throw new RuntimeException("Slot no longer available.");
-        }
-
-        booking.setStatus("CONFIRMED");
-        return bookingRepository.save(booking);
-    }
-    
-    public Booking rejectBooking(Long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
-        booking.setStatus("REJECTED");
-        return bookingRepository.save(booking);
-    }
 
     public void cancelBooking(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         booking.setStatus("CANCELLED");
         bookingRepository.save(booking);
-    }
-
-    public List<Booking> getBookingsByDateRange(LocalDateTime start, LocalDateTime end) {
-        return bookingRepository.findAllByDateRange(start, end);
     }
 }

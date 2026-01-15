@@ -12,16 +12,11 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByUserId(Long userId);
     List<Booking> findByRoomId(Long roomId);
-    List<Booking> findByStatus(String status);
     
-    @Query("SELECT b FROM Booking b WHERE b.room.id = :roomId AND (b.status = 'CONFIRMED' OR b.status = 'PENDING') AND " +
+    @Query("SELECT b FROM Booking b WHERE b.room.id = :roomId AND b.status = 'CONFIRMED' AND " +
            "((b.startTime BETWEEN :start AND :end) OR (b.endTime BETWEEN :start AND :end) OR " +
            "(:start BETWEEN b.startTime AND b.endTime))")
     List<Booking> findConflictingBookings(@Param("roomId") Long roomId, 
                                           @Param("start") LocalDateTime start, 
                                           @Param("end") LocalDateTime end);
-
-    @Query("SELECT b FROM Booking b WHERE (b.status = 'CONFIRMED' OR b.status = 'PENDING') AND " +
-           "((b.startTime BETWEEN :start AND :end) OR (b.endTime BETWEEN :start AND :end))")
-    List<Booking> findAllByDateRange(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }
