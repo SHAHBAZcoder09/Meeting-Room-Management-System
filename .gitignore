@@ -65,3 +65,10 @@ bin/
 
 # System and backup files
 *.bak
+.env
+CONNECTION_VERIFICATION.md
+repro_issue.sh
+SHARING_AND_SETUP_GUIDE.md
+SQL_SCHEMA.md
+Technical_Design_Document.md
+test_search.sh
