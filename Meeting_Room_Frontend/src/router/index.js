@@ -6,23 +6,53 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'login',
-      component: () => import('../views/LoginView.vue'),
-    },
-    {
-      path: '/home',
       name: 'home',
       component: HomeView,
     },
     {
       path: '/login',
-      name: 'login-alt',
+      name: 'login',
       component: () => import('../views/LoginView.vue'),
     },
     {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
+    },
+    {
+      path: '/calendar',
+      name: 'calendar',
+      component: () => import('../views/RoomCalendarView.vue'),
+    },
+    {
+      path: '/admin/rooms',
+      name: 'admin-rooms',
+      component: () => import('../views/admin/AdminRoomsView.vue'),
+    },
+    {
+      path: '/admin/bookings',
+      name: 'admin-bookings',
+      component: () => import('../views/admin/AdminBookingsView.vue'),
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('../views/RegisterView.vue'),
+    },
+    {
+      path: '/book/:roomId',
+      name: 'book-room',
+      component: () => import('../views/BookingView.vue'),
+    },
+    {
+      path: '/my-bookings',
+      name: 'my-bookings',
+      component: () => import('../views/MyBookingsView.vue'),
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue'),
     },
     {
       path: '/about',

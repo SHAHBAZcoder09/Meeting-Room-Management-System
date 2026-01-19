@@ -1,302 +1,466 @@
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <h1>Welcome Back</h1>
-      <p class="subtitle">Please sign in to continue</p>
-      
-      <form @submit.prevent="handleLogin" class="login-form">
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input 
-            type="email" 
-            id="email" 
-            v-model="email" 
-            placeholder="name@company.com" 
-            required
-            autocomplete="email"
-          />
-        </div>
+  <div class="auth-page">
+    <!-- Animated Background -->
+    <div class="bg-wrapper">
+      <div class="mesh-gradient"></div>
+      <div class="grid-overlay"></div>
+      <div class="floating-orb orb-1"></div>
+      <div class="floating-orb orb-2"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-container">
+      <div class="nav-content">
+        <router-link to="/" class="logo">
+          <span class="logo-text">N4</span><span class="logo-accent">Booking</span>
+        </router-link>
         
-        <div class="form-group">
-          <div class="label-row">
-            <label for="password">Password</label>
-            <a href="#" class="forgot-link">Forgot password?</a>
+        <div class="nav-actions">
+          <LanguageSwitcher />
+          <v-btn variant="text" color="white" to="/" class="text-capitalize mr-2">
+            <v-icon start icon="mdi-arrow-left" size="small"></v-icon>
+            {{ $t('nav.backToHome') }}
+          </v-btn>
+          <v-btn variant="outlined" color="white" to="/register" class="text-capitalize px-6" rounded="pill">
+            {{ $t('nav.createAccount') }}
+          </v-btn>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="auth-content">
+      <div class="auth-container slide-up">
+        <!-- Left Side - Branding -->
+        <div class="auth-branding d-none d-lg-flex">
+          <div class="branding-content">
+            <h2 class="branding-title">{{ $t('auth.welcomeBack') }}<br><span class="title-gradient">N4Booking</span></h2>
+            <p class="branding-subtitle">{{ $t('home.heroSubtitle') }}</p>
+            
+            <div class="branding-features">
+              <div class="feature-item">
+                <v-icon icon="mdi-check-circle" color="success" size="20"></v-icon>
+                <span>{{ $t('auth.instantBooking') }}</span>
+              </div>
+              <div class="feature-item">
+                <v-icon icon="mdi-check-circle" color="success" size="20"></v-icon>
+                <span>{{ $t('auth.realTimeAvail') }}</span>
+              </div>
+              <div class="feature-item">
+                <v-icon icon="mdi-check-circle" color="success" size="20"></v-icon>
+                <span>{{ $t('auth.smartNotifications') }}</span>
+              </div>
+            </div>
           </div>
-          <input 
-            type="password" 
-            id="password" 
-            v-model="password" 
-            placeholder="••••••••" 
-            required
-            autocomplete="current-password"
-          />
         </div>
 
-        <button type="submit" class="submit-btn" :class="{ 'loading': isLoading }">
-          <span v-if="!isLoading">Sign In</span>
-          <span v-else class="loader"></span>
-        </button>
-      </form>
-      
-      <div class="footer-links">
-        <p>Don't have an account? <a href="#">Sign up</a></p>
+        <!-- Right Side - Form -->
+        <div class="auth-form-container">
+          <v-card theme="dark" class="auth-card" elevation="0" rounded="xl">
+            <div class="text-center mb-8">
+              <div class="avatar-container mb-4">
+                <v-avatar color="primary" size="72" class="glow-avatar">
+                  <v-icon icon="mdi-login" size="36" color="white"></v-icon>
+                </v-avatar>
+              </div>
+              <h1 class="text-h4 font-weight-bold text-white mb-2">{{ $t('auth.signIn') }}</h1>
+              <p class="text-grey-lighten-1">{{ $t('auth.signInSubtitle') }}</p>
+            </div>
+
+            <v-form @submit.prevent="handleLogin" v-model="isValid">
+              <v-text-field
+                v-model="email"
+                :label="$t('auth.email')"
+                placeholder="name@company.com"
+                prepend-inner-icon="mdi-email-outline"
+                variant="outlined"
+                color="primary"
+                class="mb-4"
+                :rules="[v => !!v || 'Email is required']"
+                bg-color="rgba(0,0,0,0.2)"
+              ></v-text-field>
+
+              <v-text-field
+                v-model="password"
+                :label="$t('auth.password')"
+                placeholder="••••••••"
+                :type="showPassword ? 'text' : 'password'"
+                :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append-inner="showPassword = !showPassword"
+                prepend-inner-icon="mdi-lock-outline"
+                variant="outlined"
+                color="primary"
+                class="mb-2"
+                :rules="[v => !!v || 'Password is required']"
+                bg-color="rgba(0,0,0,0.2)"
+              ></v-text-field>
+
+
+
+              <v-btn
+                block
+                color="primary"
+                size="x-large"
+                type="submit"
+                rounded="lg"
+                :loading="isLoading"
+                class="text-capitalize font-weight-bold cta-btn mb-4"
+                height="52"
+              >
+                <v-icon icon="mdi-login" class="mr-2"></v-icon>
+                {{ $t('auth.signIn') }}
+              </v-btn>
+            </v-form>
+
+            <div class="text-center text-body-2 text-grey">
+              {{ $t('auth.noAccount') }} 
+              <router-link to="/register" class="text-primary font-weight-bold text-decoration-none">{{ $t('auth.createOne') }}</router-link>
+            </div>
+          </v-card>
+        </div>
       </div>
     </div>
+
+    <!-- Snackbar -->
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="4000" location="top">
+      {{ snackbar.text }}
+      <template v-slot:actions>
+        <v-btn variant="text" @click="snackbar.show = false" icon="mdi-close"></v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 
-// Generate 21 Demo Users to match user request style
-const DEMO_USERS = Array.from({ length: 21 }, (_, index) => {
-  const id = index + 1;
-  // Random names and regions for variety
-  const firstNames = ['Peng', 'Li', 'Yin', 'Billy', 'Sato', 'Liang', 'John', 'Jane', 'Akira', 'Maria', 'Chen', 'David', 'Sarah', 'Mike', 'Emily', 'Robert', 'Linda', 'William', 'Elizabeth', 'James', 'Barbara'];
-  const lastNames = ['Xiuying', 'Ziyi', 'Gonzalez', 'Hazuki', 'Yunxi', 'Smith', 'Doe', 'Yamamoto', 'Garcia', 'Wei', 'Brown', 'Davis', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin'];
-  
-  const name = `${firstNames[index % firstNames.length]} ${lastNames[index % lastNames.length]}`;
-  const regionId = Math.floor(Math.random() * 900) + 100; // Random 3 digit ID
-  
-  // Random times
-  const h = String(Math.floor(Math.random() * 24)).padStart(2, '0');
-  const m = String(Math.floor(Math.random() * 60)).padStart(2, '0');
-  const s = String(Math.floor(Math.random() * 60)).padStart(2, '0');
-  const createdTime = `${h}:${m}:${s}`;
-  
-  const y = 2020 + Math.floor(Math.random() * 6);
-  const mo = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
-  const d = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
-  const updatedTime = `${y}-${mo}-${d}`;
-
-  return {
-    id,
-    name,
-    regionId: String(regionId),
-    createdTime,
-    updatedTime,
-    // Add credentials for the first few so we can actually login
-    email: index === 0 ? 'admin@company.com' : `user${id}@company.com`,
-    password: index === 0 ? 'password123' : 'password'
-  };
-});
-
-const email = ref('shahbazgaming1@gmail.com');
-const password = ref('123456789');
+const email = ref('');
+const password = ref('');
+const showPassword = ref(false);
 const isLoading = ref(false);
+const isValid = ref(false);
 const router = useRouter();
 
+const snackbar = ref({ show: false, text: '', color: 'error' });
+
+const showNotification = (text, color = 'error') => {
+  snackbar.value = { show: true, text, color };
+};
+
 const handleLogin = async () => {
-  isLoading.value = true;
-  
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Check for valid credentials
-  const isValidCredential = (email.value === 'shahbazgaming1@gmail.com' && password.value === '123456789') || 
-                            (email.value === 'admin@company.com' && password.value === 'password123');
-  
-  const user = DEMO_USERS.find(u => u.email === email.value && u.password === password.value) || 
-               (isValidCredential ? DEMO_USERS[0] : null);
+    if (!isValid.value) return;
+    
+    isLoading.value = true;
+    try {
+        const response = await fetch('/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email.value, password: password.value })
+        });
 
-  if (user || isValidCredential) {
-    // Log the entire array of users as requested
-    console.log(DEMO_USERS);
-
-    isLoading.value = false;
-    router.push('/dashboard');
-  } else {
-    console.warn('Invalid Credentials given. Try shahbazgaming1@gmail.com / 123456789 or admin@company.com / password123');
-    alert('Invalid credentials! Try: shahbazgaming1@gmail.com / 123456789 or admin@company.com / password123');
-    isLoading.value = false;
-  }
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('authToken', data.token);
+             const userObj = {
+                id: data.userId,
+                email: data.email,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                role: data.role
+            };
+            localStorage.setItem('user', JSON.stringify(userObj));
+            router.push('/dashboard');
+        } else {
+            const errorData = await response.json();
+            showNotification(errorData.message || 'Invalid credentials', 'error');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showNotification('Network error occurred', 'error');
+    } finally {
+        isLoading.value = false;
+    }
 };
 </script>
 
 <style scoped>
-/* Modern, Premium Dark Aesthetic with Glassmorphism */
-.login-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.auth-page {
   min-height: 100vh;
-  width: 100%;
-  background: radial-gradient(circle at top right, #2d3748, #1a202c);
-  background-size: cover;
-  color: #fff;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  padding: 20px;
-}
-
-.login-card {
-  width: 100%;
-  max-width: 420px;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: 40px;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  text-align: center;
-  animation: fadeIn 0.6s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.brand-logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
-  margin-bottom: 24px;
-  box-shadow: 0 10px 15px -3px rgba(118, 75, 162, 0.3);
-}
-
-.brand-logo svg {
-  width: 28px;
-  height: 28px;
-  color: white;
-}
-
-h1 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  background: linear-gradient(to right, #fff, #a0aec0);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.subtitle {
-  color: #718096;
-  font-size: 0.95rem;
-  margin-bottom: 32px;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  text-align: left;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #a0aec0;
-}
-
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-input {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 12px 16px;
-  color: white;
-  font-size: 1rem;
-  transition: all 0.25s ease;
-  outline: none;
-}
-
-input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-  background: rgba(0, 0, 0, 0.3);
-}
-
-input::placeholder {
-  color: #4a5568;
-}
-
-.forgot-link {
-  font-size: 0.8rem;
-  color: #667eea;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.forgot-link:hover {
-  color: #764ba2;
-  text-decoration: underline;
-}
-
-.submit-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 14px;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.2s, opacity 0.2s;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-  margin-top: 8px;
+  background: #0a0e1a;
   position: relative;
   overflow: hidden;
 }
 
-.submit-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 15px -3px rgba(118, 75, 162, 0.3);
+/* Background */
+.bg-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.submit-btn:active {
-  transform: translateY(0);
+.mesh-gradient {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
 }
 
-.submit-btn.loading {
-  opacity: 0.8;
-  cursor: wait;
+.grid-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
 }
 
-.loader {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255,255,255,0.3);
+.floating-orb {
+  position: absolute;
   border-radius: 50%;
-  border-top-color: white;
-  animation: spin 0.8s linear infinite;
+  filter: blur(60px);
+  animation: float-orb 20s ease-in-out infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.orb-1 {
+  width: 300px;
+  height: 300px;
+  background: rgba(59, 130, 246, 0.25);
+  top: 20%;
+  left: 10%;
 }
 
-.footer-links {
-  margin-top: 24px;
-  font-size: 0.9rem;
-  color: #718096;
+.orb-2 {
+  width: 250px;
+  height: 250px;
+  background: rgba(139, 92, 246, 0.2);
+  bottom: 20%;
+  right: 15%;
+  animation-delay: -10s;
 }
 
-.footer-links a {
-  color: #667eea;
+@keyframes float-orb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -30px) scale(1.1); }
+}
+
+/* Navigation */
+.nav-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 0;
+  background: rgba(10, 14, 26, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
   text-decoration: none;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 800;
 }
 
-.footer-links a:hover {
-  text-decoration: underline;
+.logo-text { color: white; }
+.logo-accent { color: #3b82f6; }
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* Content */
+.auth-content {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-container {
+  display: flex;
+  max-width: 1000px;
+  width: 100%;
+  gap: 48px;
+}
+
+/* Left Branding */
+.auth-branding {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: 48px;
+}
+
+.branding-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.title-gradient {
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.branding-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.branding-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Right Form */
+.auth-form-container {
+  flex: 1;
+  max-width: 450px;
+}
+
+.auth-card {
+  background: rgba(30, 41, 59, 0.6) !important;
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 40px;
+}
+
+.avatar-container {
+  display: inline-block;
+}
+
+.glow-avatar {
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.5), 0 0 80px rgba(59, 130, 246, 0.3);
+}
+
+.cta-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+}
+
+/* Animations */
+.slide-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 960px) {
+  .auth-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .auth-form-container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav-container {
+    padding: 12px 0;
+  }
+  
+  .nav-content {
+    padding: 0 16px;
+  }
+  
+  .logo {
+    font-size: 1.25rem;
+  }
+  
+  .nav-actions .v-btn {
+    padding: 0 10px !important;
+    font-size: 0.75rem;
+  }
+  
+  .auth-content {
+    padding: 80px 16px 24px;
+  }
+  
+  .auth-card {
+    padding: 24px 20px;
+  }
+  
+  .auth-card .text-h4 {
+    font-size: 1.5rem !important;
+  }
+  
+  .auth-card .text-grey-lighten-1 {
+    font-size: 0.85rem;
+  }
+  
+  .glow-avatar {
+    width: 56px !important;
+    height: 56px !important;
+  }
+  
+  .glow-avatar .v-icon {
+    font-size: 28px !important;
+  }
+  
+  .cta-btn {
+    height: 48px !important;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .auth-card {
+    padding: 20px 16px;
+  }
+  
+  .auth-card .text-h4 {
+    font-size: 1.25rem !important;
+  }
+  
+  .nav-actions .v-btn:not(:last-child) {
+    display: none;
+  }
 }
 </style>

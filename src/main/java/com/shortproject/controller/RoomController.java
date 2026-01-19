@@ -5,6 +5,7 @@ import com.shortproject.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,6 +18,24 @@ public class RoomController {
     @GetMapping
     public ResponseEntity<List<MeetingRoom>> getAllRooms() {
         return ResponseEntity.ok(roomService.getAllRooms());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<MeetingRoom>> searchRooms(
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String startTime,
+            @RequestParam(required = false) String endTime,
+            @RequestParam(required = false) Integer capacity) {
+        
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+
+        if (date != null && startTime != null && endTime != null) {
+            start = LocalDateTime.parse(date + "T" + startTime);
+            end = LocalDateTime.parse(date + "T" + endTime);
+        }
+
+        return ResponseEntity.ok(roomService.searchRooms(start, end, capacity));
     }
 
     @PostMapping
