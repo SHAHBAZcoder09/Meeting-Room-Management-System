@@ -1,0 +1,346 @@
+Story name	Meeting Room Management System			Test environment	IntelliJ IDEA, JDK 1.8, Win10		
+Use Case Owner	Ayush Maheshwari			Number of cases	50		
+								
+Test Result	Use case number	Business Scenario Description	Precondition	Test steps	Priority	Input Data	Expected Result	Measured Result
+Passed	TC-001	Verify user login with valid credentials	1. User has registered account
+2. User is on login page	1. Enter valid email in email field
+2. Enter correct password
+3. Click Login button
+4. Verify response	Level1	email: user@example.com
+password: password123	1. Login successful
+2. JWT token returned
+3. User redirected to dashboard
+4. User details displayed	1. Login successful
+2. Token received
+3. Redirected to dashboard
+4. User details shown correctly
+Passed	TC-002	Verify user login with invalid credentials	1. User is on login page	1. Enter invalid email address
+2. Enter wrong password
+3. Click Login button
+4. Check error message	Level1	email: invalid@test.com
+password: wrongpass	1. Login fails
+2. Error message displayed
+3. User stays on login page	1. Login failed
+2. Error message shown
+3. Remained on login page
+Failed	TC-003	Verify user login with empty fields	1. User is on login page	1. Leave email field empty
+2. Leave password field empty
+3. Click Login button	Level2	email: (empty)
+password: (empty)	1. Validation error shown
+2. Required field message displayed
+3. Form not submitted	1. Validation error shown
+2. Required message displayed
+3. Form not submitted
+Passed	TC-004	Verify user registration with valid data	1. User is on registration page
+2. Email not already registered	1. Enter valid email
+2. Enter password (min 6 chars)
+3. Enter first name
+4. Enter last name
+5. Click Register button	Level1	email: newuser@example.com
+password: pass123456
+firstName: John
+lastName: Doe	1. Registration successful
+2. JWT token returned
+3. User account created
+4. Role set to USER	1. Registration successful
+2. Token received
+3. Account created
+4. Role is USER
+Passed	TC-005	Verify registration with existing email	1. User is on registration page
+2. Email already exists in system	1. Enter existing email
+2. Enter valid password
+3. Enter first and last name
+4. Click Register button	Level1	email: existing@example.com
+password: pass123456
+firstName: Test
+lastName: User	1. Registration fails
+2. Error: Email already exists
+3. User stays on register page	1. Registration failed
+2. Email exists error shown
+3. Stayed on register page
+Passed	TC-006	Verify registration with weak password	1. User is on registration page	1. Enter valid email
+2. Enter password < 6 characters
+3. Enter first and last name
+4. Click Register button	Level2	email: test@example.com
+password: 123
+firstName: Test
+lastName: User	1. Validation error shown
+2. Password length message
+3. Registration not processed	1. Validation error displayed
+2. Password message shown
+3. Registration blocked
+Passed	TC-007	Verify get user by ID	1. User is logged in
+2. Valid user ID exists	1. Send GET /api/users/{id}
+2. Use valid user ID
+3. Check response	Level1	userId: 1	1. HTTP 200 OK
+2. User details returned
+3. All fields present	1. HTTP 200 OK
+2. User details received
+3. All fields present
+Passed	TC-008	Verify get user with invalid ID	1. User is logged in	1. Send GET /api/users/{id}
+2. Use non-existent ID
+3. Check error response	Level2	userId: 99999	1. HTTP 404 Not Found
+2. User not found error	1. HTTP 404 returned
+2. Error message received
+Passed	TC-009	Verify get all users	1. User is logged in
+2. Users exist in system	1. Send GET /api/users
+2. Check response structure	Level1	None	1. HTTP 200 OK
+2. Array of users returned
+3. Each user has all fields	1. HTTP 200 OK
+2. User array received
+3. All fields present
+Passed	TC-010	Verify update user	1. User is logged in
+2. Valid user ID exists	1. Send PUT /api/users/{id}
+2. Include updated details
+3. Verify response	Level1	userId: 1
+firstName: Updated
+lastName: User	1. HTTP 200 OK
+2. Updated user returned
+3. updatedAt refreshed	1. HTTP 200 OK
+2. Updated data returned
+3. Timestamp updated
+Passed	TC-011	Verify delete user	1. User is logged in
+2. Valid user ID exists	1. Send DELETE /api/users/{id}
+2. Check response status	Level1	userId: 1	1. HTTP 204 No Content
+2. User removed from system	1. HTTP 204 returned
+2. User deleted
+Passed	TC-012	Verify change password - valid current password	1. User is logged in
+2. User knows current password	1. Send POST /api/users/{id}/change-password
+2. Include currentPassword and newPassword
+3. Verify response	Level1	userId: 1
+currentPassword: oldpass123
+newPassword: newpass123	1. HTTP 200 OK
+2. Password changed message
+3. Can login with new password	1. HTTP 200 OK
+2. Success message
+3. New password works
+Passed	TC-013	Verify change password - wrong current password	1. User is logged in	1. Send POST /api/users/{id}/change-password
+2. Include wrong currentPassword
+3. Check error	Level2	userId: 1
+currentPassword: wrongpass
+newPassword: newpass123	1. HTTP 400 Bad Request
+2. Incorrect password error
+3. Password unchanged	1. HTTP 400 returned
+2. Error message shown
+3. Password not changed
+Passed	TC-014	Verify health check endpoint	1. Application is running	1. Send GET /api/users/health/check
+2. Check response	Level3	None	1. HTTP 200 OK
+2. "Application is healthy"	1. HTTP 200 OK
+2. Healthy message received
+Passed	TC-015	Verify get all rooms	1. User is logged in
+2. Rooms exist in system	1. Send GET /api/rooms
+2. Check response structure	Level1	None	1. HTTP 200 OK
+2. Array of rooms returned
+3. Each room has all fields	1. HTTP 200 OK
+2. Room array received
+3. All fields present
+Passed	TC-016	Verify search rooms with filters	1. User is logged in
+2. Rooms with varying capacities exist	1. Send GET /api/rooms/search
+2. Include date, startTime, endTime, capacity
+3. Verify filtered results	Level1	date: 2026-01-18
+startTime: 09:00
+endTime: 10:00
+capacity: 5	1. HTTP 200 OK
+2. Only matching rooms returned
+3. Unavailable rooms excluded	1. HTTP 200 OK
+2. Filtered rooms returned
+3. Correct filtering applied
+Passed	TC-017	Verify search rooms without filters	1. User is logged in	1. Send GET /api/rooms/search
+2. No query parameters	Level2	None	1. HTTP 200 OK
+2. All available rooms returned	1. HTTP 200 OK
+2. All rooms returned
+Passed	TC-018	Verify create room (Admin)	1. Admin user is logged in	1. Send POST /api/rooms
+2. Include room details
+3. Verify response	Level1	name: Conference Room A
+capacity: 10
+amenities: Projector,WiFi
+status: AVAILABLE	1. HTTP 200 OK
+2. Room created with ID
+3. Room in room list	1. HTTP 200 OK
+2. Room ID generated
+3. Appears in list
+Passed	TC-019	Verify get room by ID	1. User is logged in
+2. Valid room ID exists	1. Send GET /api/rooms/{id}
+2. Check response	Level1	roomId: 1	1. HTTP 200 OK
+2. Room details returned	1. HTTP 200 OK
+2. Room details received
+Passed	TC-020	Verify update room (Admin)	1. Admin is logged in
+2. Valid room ID exists	1. Send PUT /api/rooms/{id}
+2. Include updated details	Level1	roomId: 1
+name: Updated Room
+capacity: 15	1. HTTP 200 OK
+2. Updated room returned	1. HTTP 200 OK
+2. Room updated
+Passed	TC-021	Verify delete room (Admin)	1. Admin is logged in
+2. Room has no active bookings	1. Send DELETE /api/rooms/{id}
+2. Check response	Level1	roomId: 1	1. HTTP 200 OK
+2. Room removed	1. HTTP 200 OK
+2. Room deleted
+Passed	TC-022	Verify create booking successfully	1. User is logged in
+2. Room available for time slot	1. Send POST /api/bookings
+2. Include userId, roomId, times, purpose
+3. Verify response	Level1	userId: 1
+roomId: 1
+startTime: 2026-01-18T09:00:00
+endTime: 2026-01-18T10:00:00
+purpose: Team meeting	1. HTTP 200 OK
+2. Booking created with ID
+3. Status is PENDING	1. HTTP 200 OK
+2. Booking ID generated
+3. Status: PENDING
+Passed	TC-023	Verify create booking - time conflict	1. User is logged in
+2. Room has existing booking	1. Send POST /api/bookings
+2. Select conflicting time slot	Level1	userId: 1
+roomId: 1
+startTime: 2026-01-18T09:00:00
+endTime: 2026-01-18T10:00:00	1. HTTP 400 Bad Request
+2. Room not available error	1. HTTP 400 returned
+2. Conflict error shown
+Passed	TC-024	Verify create booking - invalid time range	1. User is logged in	1. Send POST /api/bookings
+2. Set endTime before startTime	Level2	userId: 1
+roomId: 1
+startTime: 2026-01-18T10:00:00
+endTime: 2026-01-18T09:00:00	1. HTTP 400 Bad Request
+2. Invalid time range error	1. HTTP 400 returned
+2. Validation error shown
+Passed	TC-025	Verify get user bookings	1. User is logged in
+2. User has bookings	1. Send GET /api/bookings/user/{userId}
+2. Check response	Level1	userId: 1	1. HTTP 200 OK
+2. User's bookings returned	1. HTTP 200 OK
+2. Bookings list received
+Passed	TC-026	Verify cancel booking	1. User is logged in
+2. User has active booking	1. Send POST /api/bookings/{id}/cancel
+2. Verify response	Level1	bookingId: 1	1. HTTP 200 OK
+2. Booking cancelled
+3. Time slot available	1. HTTP 200 OK
+2. Booking cancelled
+3. Slot freed
+Passed	TC-027	Verify get bookings by date range	1. User is logged in
+2. Bookings exist	1. Send GET /api/bookings/range
+2. Include start and end params	Level2	start: 2026-01-18T00:00:00
+end: 2026-01-18T23:59:59	1. HTTP 200 OK
+2. Filtered bookings returned	1. HTTP 200 OK
+2. Bookings in range returned
+Passed	TC-028	Verify get pending bookings (Admin)	1. Admin is logged in
+2. Pending bookings exist	1. Send GET /api/bookings/pending
+2. Check response	Level1	None	1. HTTP 200 OK
+2. Only PENDING bookings	1. HTTP 200 OK
+2. Pending bookings list
+Passed	TC-029	Verify get all bookings (Admin)	1. Admin is logged in	1. Send GET /api/bookings/admin/all
+2. Check response	Level1	None	1. HTTP 200 OK
+2. All bookings returned	1. HTTP 200 OK
+2. Complete booking list
+Passed	TC-030	Verify approve booking (Admin)	1. Admin is logged in
+2. Pending booking exists	1. Send POST /api/bookings/{id}/approve
+2. Verify response	Level1	bookingId: 1	1. HTTP 200 OK
+2. Status: CONFIRMED	1. HTTP 200 OK
+2. Status changed to CONFIRMED
+Passed	TC-031	Verify reject booking (Admin)	1. Admin is logged in
+2. Pending booking exists	1. Send POST /api/bookings/{id}/reject
+2. Verify response	Level1	bookingId: 1	1. HTTP 200 OK
+2. Status: REJECTED	1. HTTP 200 OK
+2. Status changed to REJECTED
+Passed	TC-032	Verify get dashboard stats	1. User is logged in	1. Send GET /api/stats
+2. Check response structure	Level1	None	1. HTTP 200 OK
+2. totalRooms present
+3. activeBookings present
+4. pendingBookings present
+5. confirmedBookingsToday present
+6. availableRooms present
+7. mostPopularRoomName present	1. HTTP 200 OK
+2. All stats returned
+3. Values accurate
+Passed	TC-033	Verify stats update after booking	1. User is logged in
+2. Initial stats recorded	1. Create a new booking
+2. Send GET /api/stats
+3. Compare stats	Level2	New booking created	1. pendingBookings increased
+2. Stats reflect new booking	1. Booking count updated
+2. Stats accurate
+Passed	TC-034	Verify login page responsiveness	1. Access login page	1. Resize browser to mobile
+2. Check tablet dimensions
+3. Verify desktop layout	Level2	Various screen sizes	1. Mobile view adapts
+2. Tablet view correct
+3. Desktop optimal layout	1. Responsive design works
+2. All breakpoints handled
+Passed	TC-035	Verify login button hover effects	1. Access login page	1. Hover over Login button
+2. Observe visual changes	Level3	Mouse hover action	1. Hover effect visible
+2. Cursor changes to pointer	1. Hover effect applied
+2. Pointer cursor shown
+Passed	TC-036	Verify room cards display	1. Navigate to rooms page	1. Check room card layout
+2. Verify images load
+3. Check capacity badges	Level2	None	1. Grid layout displayed
+2. Images or placeholders shown
+3. Capacity visible	1. Cards displayed correctly
+2. Images loaded
+3. All info visible
+Passed	TC-037	Verify room search filters	1. Navigate to rooms page	1. Use date picker
+2. Set time range
+3. Set capacity filter
+4. Click search	Level2	date: 2026-01-18
+startTime: 09:00
+endTime: 10:00
+capacity: 5	1. Filters applied
+2. Results updated	1. Filters working
+2. Correct results shown
+Passed	TC-038	Verify booking form validation	1. Navigate to booking form	1. Submit empty form
+2. Enter past date
+3. Set invalid time range	Level2	Empty or invalid data	1. Required errors shown
+2. Past date rejected
+3. Time error shown	1. Validation working
+2. Errors displayed correctly
+Passed	TC-039	Verify my bookings list display	1. User has bookings
+2. Navigate to my bookings	1. Check booking cards
+2. Verify status badges
+3. Check cancel button	Level2	None	1. Bookings listed
+2. Status color-coded
+3. Cancel button visible	1. List displayed
+2. Status badges correct
+3. Actions available
+Passed	TC-040	Verify admin panel access control	1. Regular user logged in	1. Try to access admin routes
+2. Check admin tab visibility	Level1	Regular user credentials	1. Admin routes blocked
+2. Admin tab hidden	1. Access denied
+2. Tab not visible
+Passed	TC-041	Verify admin can see admin tab	1. Admin user logged in	1. Check navbar
+2. Click admin tab	Level1	Admin user credentials	1. Admin tab visible
+2. Admin panel loads	1. Tab visible
+2. Panel accessible
+Passed	TC-042	Verify language toggle functionality	1. User on any page	1. Locate language switcher
+2. Switch to Chinese
+3. Switch back to English	Level2	Toggle action	1. Switcher visible
+2. UI changes to Chinese
+3. UI reverts to English	1. Toggle works
+2. Languages switch correctly
+Passed	TC-043	Verify language persistence	1. User selects Chinese	1. Switch to Chinese
+2. Refresh page
+3. Check language	Level2	Chinese selected	1. Chinese persists after refresh
+2. Stored in localStorage	1. Language persisted
+2. Storage working
+Passed	TC-044	Verify 404 error handling	1. User logged in	1. Navigate to invalid route
+2. Check error page	Level3	Invalid URL	1. 404 page shown
+2. Navigate back available	1. 404 displayed
+2. Navigation works
+Passed	TC-045	Verify network error handling	1. User on any page	1. Disable network
+2. Try an action	Level3	Network disabled	1. Graceful error message
+2. Not raw error	1. User-friendly error
+2. Handled gracefully
+Pending	TC-046	Verify session expiry handling	1. User logged in
+2. Token expired	1. Perform authenticated action
+2. Check response	Level2	Expired token	1. Redirect to login
+2. Session expiry message	Pending verification
+Pending	TC-047	Verify password not exposed in API	1. User exists	1. GET /api/users/{id}
+2. Check password field	Level1	userId: 1	1. Password masked or hashed
+2. No plain text	Pending verification
+Pending	TC-048	Verify token-based authentication	1. User not logged in	1. Access protected endpoint
+2. No token provided	Level1	No auth token	1. HTTP 401 Unauthorized
+2. Access denied	Pending verification
+Pending	TC-049	Verify SQL injection prevention	1. User on login page	1. Enter SQL injection in email
+2. Enter SQL injection in password
+3. Submit	Level1	email: ' OR '1'='1
+password: ' OR '1'='1	1. Login fails gracefully
+2. No SQL error exposed
+3. DB not compromised	Pending verification
+Pending	TC-050	Verify XSS prevention	1. User on any input form	1. Enter XSS script in input
+2. Submit form
+3. Check if script executes	Level1	purpose: <script>alert('XSS')</script>	1. Script not executed
+2. Input sanitized
+3. Safe display	Pending verification
