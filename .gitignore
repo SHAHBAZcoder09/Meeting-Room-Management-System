@@ -65,3 +65,4 @@ bin/
 
 # System and backup files
 *.bak
+.env
