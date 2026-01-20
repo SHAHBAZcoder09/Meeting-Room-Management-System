@@ -314,138 +314,55 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
-
-const { t } = useI18n();
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const route = useRoute();
-
-const user = ref(JSON.parse(localStorage.getItem('user') || '{}'));
-const isAdmin = computed(() => user.value.role === 'ADMIN');
-const userName = computed(() => user.value.firstName ? `${user.value.firstName} ${user.value.lastName || ''}` : 'User');
-const userInitials = computed(() => {
-    if(!user.value.firstName) return 'U';
-    return `${user.value.firstName[0]}${user.value.lastName ? user.value.lastName[0] : ''}`.toUpperCase();
-});
-
-const greeting = computed(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return t('dashboard.greetingMorning');
-    if (hour < 17) return t('dashboard.greetingAfternoon');
-    return t('dashboard.greetingEvening');
-});
 
 const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    sessionStorage.clear();
-    router.push('/');
+  // Clear any stored user data/tokens
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('user');
+  sessionStorage.clear();
+  
+  // Redirect to login page
+  router.push('/');
 };
 
-const rooms = ref([]);
-const stats = ref({ availableRooms: 0, activeBookings: 0, confirmedBookingsToday: 0 });
-
-// Filters
-const filterDate = ref('');
-const filterStart = ref('');
-const filterEnd = ref('');
-const filterCapacity = ref('');
-const timeSlots = [];
-for (let i = 8; i <= 20; i++) {
-    timeSlots.push(`${i.toString().padStart(2, '0')}:00`);
-    timeSlots.push(`${i.toString().padStart(2, '0')}:30`);
-}
-
-const getRoomStatusColor = (status) => {
-    if(!status) return 'grey';
-    switch(status.toLowerCase()) {
-        case 'available': return 'success';
-        case 'occupied': return 'error';
-        case 'maintenance': return 'warning';
-        default: return 'grey';
-    }
-};
-
-const roomLarge1 = 'https://cache.marriott.com/content/dam/marriott-renditions/OKCAL/okcal-conference-setup-0205-hor-feat.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1920px%3A*';
-const roomLarge2 = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiEw_Xrr6PA9v1O3PEDPQmkYUe1NQJc878sw&s';
-import roomExtraLarge from '@/assets/image.png';
-import roomSmall from '@/assets/room-small.jpg';
-
-const getRoomImage = (room) => {
-    if (!room) return roomSmall;
-    if (room.capacity >= 10) return roomExtraLarge;
-    if (room.capacity >= 8) {
-        // Alternate based on ID if available, otherwise random or fixed
-        const id = room.id || 0;
-        return id % 2 === 0 ? roomLarge2 : roomLarge1;
-    }
-    return roomSmall;
-};
-
-const fetchStats = async () => {
-    try {
-        const token = localStorage.getItem('authToken');
-        const res = await fetch('/api/stats', { headers: { 'Authorization': `Bearer ${token}` } });
-        if(res.ok) stats.value = await res.json();
-    } catch(e) { console.error(e); }
-}
-
-const fetchRooms = async () => {
-  try {
-    const res = await fetch('/api/rooms', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
-    });
-    if (res.ok) rooms.value = await res.json();
-  } catch (error) {
-    console.error(error);
+const rooms = ref([
+  {
+    id: 1,
+    name: 'Nebula Conference Hall',
+    capacity: 20,
+    status: 'Available',
+    location: 'Floor 2, East Wing',
+    features: ['Projector', 'Video Conf', 'Whiteboard']
+  },
+  {
+    id: 2,
+    name: 'Starlight Huddle',
+    capacity: 6,
+    status: 'Occupied',
+    location: 'Floor 2, West Wing',
+    features: ['TV Screen', 'Whiteboard']
+  },
+  {
+    id: 3,
+    name: 'Galaxy Boardroom',
+    capacity: 12,
+    status: 'Available',
+    location: 'Floor 3, Executive Suite',
+    features: ['Projector', 'Video Conf', 'Catering']
+  },
+  {
+    id: 4,
+    name: 'Comet Pod',
+    capacity: 4,
+    status: 'Available',
+    location: 'Lobby Area',
+    features: ['Soundproof', 'TV Screen']
   }
-};
-
-const handleSearch = async () => {
-    let query = '/api/rooms/search?';
-    const params = new URLSearchParams();
-    
-    if (filterDate.value && filterStart.value && filterEnd.value) {
-        params.append('date', filterDate.value);
-        params.append('startTime', filterStart.value);
-        params.append('endTime', filterEnd.value);
-    }
-    if (filterCapacity.value) {
-        params.append('capacity', filterCapacity.value);
-    }
-    
-    if (!filterDate.value && !filterCapacity.value) {
-        fetchRooms();
-        return;
-    }
-
-    try {
-        const token = localStorage.getItem('authToken');
-        const res = await fetch(`${query}${params.toString()}`, {
-             headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) rooms.value = await res.json();
-    } catch(e) {
-        console.error(e);
-    }
-};
-
-const clearFilters = () => {
-    filterDate.value = '';
-    filterStart.value = '';
-    filterEnd.value = '';
-    filterCapacity.value = '';
-    fetchRooms();
-};
-
-onMounted(() => {
-    fetchRooms();
-    fetchStats();
-});
+]);
 </script>
 
 <style scoped>
