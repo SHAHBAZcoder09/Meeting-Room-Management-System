@@ -1,0 +1,112 @@
+Project	Meeting Room Management System	Database	MySQL 8.0
+Designer	Ayush Maheshwari	Number of Tables	3
+								
+								
+Table Name: users								
+Serial Number	Field Name	Data Type	Length	Decimal Places	Allow Null	Primary Key	Foreign Key	Default Value	Field Description
+1	id	BIGINT	20	0	NO	YES	NO	AUTO_INCREMENT	Primary key, unique user identifier
+2	email	VARCHAR	255	0	NO	NO	NO	-	User email address, must be unique
+3	password	VARCHAR	255	0	NO	NO	NO	-	Encrypted user password
+4	first_name	VARCHAR	255	0	NO	NO	NO	-	User's first name
+5	last_name	VARCHAR	255	0	NO	NO	NO	-	User's last name
+6	role	VARCHAR	50	0	NO	NO	NO	-	User role (USER, ADMIN)
+7	active	BOOLEAN	1	0	NO	NO	NO	true	User account status, true if active
+8	created_at	DATETIME	0	0	NO	NO	NO	CURRENT_TIMESTAMP	Account creation timestamp
+9	updated_at	DATETIME	0	0	NO	NO	NO	CURRENT_TIMESTAMP	Last update timestamp
+								
+								
+Table Name: meeting_rooms								
+Serial Number	Field Name	Data Type	Length	Decimal Places	Allow Null	Primary Key	Foreign Key	Default Value	Field Description
+1	id	BIGINT	20	0	NO	YES	NO	AUTO_INCREMENT	Primary key, unique room identifier
+2	name	VARCHAR	255	0	NO	NO	NO	-	Meeting room name
+3	capacity	INT	11	0	NO	NO	NO	-	Maximum number of people the room can accommodate
+4	amenities	VARCHAR	500	0	YES	NO	NO	NULL	Comma-separated list of amenities (Projector,Whiteboard,WiFi)
+5	description	VARCHAR	1000	0	YES	NO	NO	NULL	Detailed description of the meeting room
+6	status	VARCHAR	50	0	NO	NO	NO	AVAILABLE	Room status (AVAILABLE, MAINTENANCE)
+7	image_url	VARCHAR	500	0	YES	NO	NO	NULL	URL of the room image for display in UI
+								
+								
+Table Name: bookings								
+Serial Number	Field Name	Data Type	Length	Decimal Places	Allow Null	Primary Key	Foreign Key	Default Value	Field Description
+1	id	BIGINT	20	0	NO	YES	NO	AUTO_INCREMENT	Primary key, unique booking identifier
+2	user_id	BIGINT	20	0	NO	NO	YES (users.id)	-	Foreign key referencing users table, the user who made the booking
+3	room_id	BIGINT	20	0	NO	NO	YES (meeting_rooms.id)	-	Foreign key referencing meeting_rooms table, the booked room
+4	start_time	DATETIME	0	0	NO	NO	NO	-	Booking start date and time
+5	end_time	DATETIME	0	0	NO	NO	NO	-	Booking end date and time
+6	status	VARCHAR	50	0	NO	NO	NO	PENDING	Booking status (PENDING, CONFIRMED, CANCELLED, REJECTED, COMPLETED)
+7	purpose	VARCHAR	500	0	YES	NO	NO	NULL	Purpose or description of the meeting
+8	created_at	DATETIME	0	0	NO	NO	NO	CURRENT_TIMESTAMP	Booking creation timestamp
+								
+								
+=== TABLE RELATIONSHIPS ===								
+								
+Relationship	Parent Table	Child Table	Parent Field	Child Field	Relationship Type	Description			
+1	users	bookings	id	user_id	One-to-Many	One user can have many bookings			
+2	meeting_rooms	bookings	id	room_id	One-to-Many	One room can have many bookings			
+								
+								
+=== INDEXES ===								
+								
+Table	Index Name	Index Type	Columns	Description					
+users	PRIMARY	Primary Key	id	Primary key index					
+users	UK_email	Unique	email	Ensures email uniqueness					
+meeting_rooms	PRIMARY	Primary Key	id	Primary key index					
+bookings	PRIMARY	Primary Key	id	Primary key index					
+bookings	FK_user_id	Foreign Key	user_id	References users(id)					
+bookings	FK_room_id	Foreign Key	room_id	References meeting_rooms(id)					
+bookings	IDX_start_time	Index	start_time	Improves booking search performance					
+bookings	IDX_status	Index	status	Improves status-based queries					
+								
+								
+=== ENTITY RELATIONSHIP DIAGRAM (Mermaid) ===								
+								
+erDiagram								
+    users {								
+        BIGINT id PK								
+        VARCHAR email UK								
+        VARCHAR password								
+        VARCHAR first_name								
+        VARCHAR last_name								
+        VARCHAR role								
+        BOOLEAN active								
+        DATETIME created_at								
+        DATETIME updated_at								
+    }								
+    meeting_rooms {								
+        BIGINT id PK								
+        VARCHAR name								
+        INT capacity								
+        VARCHAR amenities								
+        VARCHAR description								
+        VARCHAR status								
+        VARCHAR image_url								
+    }								
+    bookings {								
+        BIGINT id PK								
+        BIGINT user_id FK								
+        BIGINT room_id FK								
+        DATETIME start_time								
+        DATETIME end_time								
+        VARCHAR status								
+        VARCHAR purpose								
+        DATETIME created_at								
+    }								
+    users ||--o{ bookings : "creates"								
+    meeting_rooms ||--o{ bookings : "has"								
+								
+								
+=== DATA DICTIONARY SUMMARY ===								
+								
+Table Name	Total Columns	Primary Key	Foreign Keys	Nullable Columns	Description				
+users	9	id	0	0	Stores user account information including authentication and profile data				
+meeting_rooms	7	id	0	3	Stores meeting room information and availability				
+bookings	8	id	2	1	Stores booking records linking users to meeting rooms with time slots				
+								
+								
+=== ENUM/STATUS VALUES ===								
+								
+Field	Table	Possible Values	Description						
+role	users	USER, ADMIN	Defines user permission level						
+active	users	true, false	Indicates if user account is active						
+status	meeting_rooms	AVAILABLE, MAINTENANCE	Indicates room availability						
+status	bookings	PENDING, CONFIRMED, CANCELLED, REJECTED, COMPLETED	Indicates booking lifecycle state						
